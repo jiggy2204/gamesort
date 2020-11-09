@@ -1,0 +1,18 @@
+{
+    "users": [
+        {
+            "first_name": "Jen",
+            "last_name": "Ignacio",
+            "username": "Admin",
+            "email": "jiggyart2204@gmail.com",
+            "password": "JL1nc01n06272014"
+            },
+            {
+            "first_name": "Kris",
+            "last_name": "Lincoln",
+            "username": "Cyrus_Thorne",
+            "email": "klincoln1083@gmail.com",
+            "password": "J3nn1f3r0x0rs1"
+            }
+    ]
+}
