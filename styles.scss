@@ -15,8 +15,128 @@ $orange: #ED7A25;
 
 body {
     font-family: Montserrat;
+    background: $black;
+    color: #fff;
+    padding: 0 15px;
+}
+
+h1 {
+    color: $green;
+}
+
+h2 {
+    color: $green;
+    font-weight: 300;
+    margin-bottom: 2%;
+}
+
+h3 {
+    color: $dkBlue;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+h4{
+    font-weight: 300;
 }
 
 hr {
     margin: 10%;
+}
+
+.hidden {
+    display: none;
+}
+
+.btn {
+    border: none;
+    box-shadow: none;
+    background: green;
+    padding: 10px 25px;
+    color: #fff;
+
+    &.prevBtn,
+    &.nextBtn {
+        margin-top: 2%;
+    }
+}
+
+label {
+    display: block;
+}
+
+input {
+    height: 37px;
+}
+
+a {
+    text-decoration: none;
+}
+
+li {
+    list-style-type: none;
+}
+
+#upcoming {
+
+    h4 {
+        margin-bottom: 5%;
+    }
+
+    #upcoming-list {
+        width: 75%;
+        margin: 5% auto;
+
+        #nextPage, 
+        #prevPage {
+            cursor: pointer;
+        }
+        
+        .upcoming-card {
+            width: 300px;
+            height: 250px;
+            background-image: cover;
+
+            .card-text {
+                width: 100%;
+                font-size: 16px;
+                padding: 12px 0px 12px 5px;
+                position: absolute;
+                bottom: 0;
+                background-color: rgba($color: $dkBlue, $alpha: 0.75);
+            }
+        }
+
+        .js-upcoming-list {
+            padding: 15px;
+        }
+    }
+}
+
+#menu-boxes {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 5%;
+
+    .main-menu-item {
+        padding: 25px 15px;
+        margin: 2%;
+        flex: 1;
+        text-align: center;
+        border-radius: 15px;
+        border: 1px solid $green;
+
+        &.selected {
+            background-color: $green;
+        }
+
+        &:active {
+            background-color: $green;
+        }
+    }
+}
+
+#search-bar {
+    display: block; 
 }
