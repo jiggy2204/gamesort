@@ -1,5 +1,54 @@
 const urlGames = "https://api.rawg.io/api/games";
+const urlDevs = "https://api.rawg.io/api/developers";
+const urlPubs = "https://api.rawg.io/api/publishers";
+const urlPlats = "https://api.rawg.io/api/platforms";
+const urlGenres = "https://api.rawg.io/api/genres";
+const urlStores = "https://api.rawg.io/api/stores";
 const apiKey = "7116511b911644eb964c5cb368954192";
+
+function testApi() {
+  const params = {
+    key: apiKey,
+    page_size: 10,
+  };
+
+  const queryString = formatQueryParams(params);
+  const url = "?" + queryString;
+
+  //   fetch(urlStores + url)
+  //     .then((response) => response.json())
+  //     .then((responseJson) => {
+  //       responseJson.results.map((e, i) => {
+  //         console.log(e.name);
+  //       });
+  //     });
+
+  //   fetch(urlDevs + url)
+  //     .then((response) => response.json())
+  //     .then((responseJson) => {
+  //       responseJson.results.map((e, i) => {
+  //         console.log(e.name);
+  //       });
+  //     });
+
+  //   fetch(urlPubs + url)
+  //     .then((response) => response.json())
+  //     .then((responseJson) => {
+  //       responseJson.results.map((e, i) => {
+  //         console.log(e.name);
+  //       });
+  //     });
+
+  //   fetch(urlPlats + url)
+  //     .then((response) => response.json())
+  //     .then((responseJson) => {
+  //       responseJson.results.map((e, i) => {
+  //         console.log(e.name);
+  //       });
+  //     });
+}
+
+// testApi();
 
 function formatQueryParams(params) {
   const queryItems = Object.keys(params).map(
@@ -8,45 +57,17 @@ function formatQueryParams(params) {
   return queryItems.join("&");
 }
 
-//Add 90 days from beginning date for upcomingGames function
+//Create addDays function to Date prototype
 Date.prototype.addDays = function (days) {
   let date = new Date(this.valueOf());
   date.setDate(date.getDate() + days);
   return date;
 };
 
-function cardCheck(responseJson) {
-  console.log(responseJson[0]);
-}
-
-function getPopup(card, responseJson) {
-  $("#card-popup").removeClass("hidden");
-
-  responseJson.results.map((e, idx) => {
-    if (e.slug === card) {
-      console.log(e);
-      $("#card-popup").append(`
-        <div id="popContent" class="popupContent" style="background:url('${e.background_image}');background-position:center;background-size:cover;>
-            <div class="popup-info">
-            <header>
-                <h3>${e.name}</h3>
-                <img src="./images/icon_removeCard.png">
-            </header>
-            <p>${e.released}</p>
-            </div>
-        </div>
-        `);
-    }
-  });
-}
-
 function displayTitleSearch(responseJson) {
-  console.log(responseJson);
   $("#search-results").empty();
 
-  let popupArray = [];
-
-  //let cardCheck = checkIfInAnyList(responseJson);
+  console.log(responseJson);
 
   responseJson.results.map((game, idx) => {
     let inputDate = new Date(game.released);
@@ -57,13 +78,19 @@ function displayTitleSearch(responseJson) {
       inputDate.getDate() +
       "/" +
       inputDate.getFullYear();
+
+    let image = "";
+
+    if (game.background_image !== null) {
+      image = `<img class="card-img" src="${game.background_image}">`;
+    }
+
     $("#search-results").append(`
             <li>
-                <div id="${game.slug}" class="card" style="background:url('${game.background_image}');background-size:cover;background-position:center;">
+                <div id="${game.slug}" class="card">
 
                 <div class="bg-darken">
-                
-                    <header class="card-header">More Info<img id="icon" src="./images/icon_addCard.png"></header>
+                    ${image}
 
                     <div class='card-info'>
                         <p class='card-name'>${game.name}</p>
@@ -102,13 +129,6 @@ function displayTitleSearch(responseJson) {
   }
 
   $("#results").css("display", "block");
-
-  let popupCard = $(".card").attr("id");
-
-  $("#icon").click(function (e) {
-    e.preventDefault();
-    getPopup(popupCard, responseJson);
-  });
 }
 
 function getNext(nextPage) {
@@ -127,7 +147,7 @@ function getTitle(gametitle) {
   const params = {
     key: apiKey,
     search: gametitle,
-    page_size: 20,
+    page_size: 5,
   };
 
   const queryString = formatQueryParams(params);
@@ -141,17 +161,17 @@ function getTitle(gametitle) {
     });
 }
 
-const displayUpcomingSection = function () {
-  return `        <!--UPCOMING GAMES NEXT MONTH-->
-<section id="upcoming">
-    <h2>Top 10 Upcoming Games</h2>
-    <h4>Add these games to your wishlist!</h4>
-    <div class="js-upcoming-list" id="upcoming-list">
-    </div>
-</section>`;
-};
+function submitSearchByTitle() {
+  $("form#search-games").submit((event) => {
+    event.preventDefault();
 
-const displayUpcoming = function (responseJson) {
+    let gametitle = $("#search").val();
+
+    getTitle(gametitle);
+  });
+}
+
+function displayUpcoming(responseJson) {
   responseJson.results.map((e, idx) => {
     //convert release date to MM/DD/YYYY format
     let inputDate = new Date(e.released);
@@ -203,9 +223,9 @@ const displayUpcoming = function (responseJson) {
       // instead of a settings object
     ],
   });
-};
+}
 
-function getUpcoming() {
+function handleUpcoming() {
   let beginDate = new Date();
   let endDate = new Date().addDays(90);
 
@@ -237,50 +257,26 @@ function getUpcoming() {
     });
 }
 
-const displayMenuBoxes = function () {
-  return `<section id="menu-boxes">
-    <!--WISHLIST-->
-    <div id="wishlist" class="main-menu-item">
-        <p>WISHLIST</p>
-        <ul id="js-wishlist-list"></ul>
-    </div>
-
-    <!--COLLECTIONS-->
-    <div id="collection" class="main-menu-item">
-        <p>COLLECTIONS</p>
-        <ul id="js-collection-list"></ul>
-    </div>
-    </section>`;
-};
-
-const displaySearch = function () {
-  return `<!--SEARCH BAR-->
-    <section id="search-bar">
-        <form id="search-games">
-            <label for="search">ENTER TITLE:</label><br>
-            <input id="search" type="text" name="gametitle">
-
-            <input id="searchBtn" form="search-games" type="submit" class="btn search-btn" value="SEARCH">
-        </form>
-        <div id="results" class="hidden">
-            <h2>Search Results</h2>
-            <ul id="search-results"></ul>
-        </div>
-    </section>`;
-};
-
-const displayList = function (type) {
+function displayList(type) {
   $(".list").append(`
     <h3>${type}</h3>
     <ul></li>
   `);
-};
+}
 
-function getList(listButton) {
+function handleListButton() {
+  $(".main-menu-item").click(function (e) {
+    e.preventDefault();
+    handleList(this.id);
+  });
+}
+
+function handleList(listButton) {
   $(".main-menu-item").removeClass("selected");
   $("#" + listButton).addClass("selected");
 
   $("#upcoming").remove();
+  $("#search-bar").remove();
   $(".list").remove();
 
   displayList(listButton);
@@ -289,24 +285,10 @@ function getList(listButton) {
     </section>`);
 }
 
-function render() {
-  getUpcoming();
-  $("body")
-    .append(displayMenuBoxes)
-    .append(displayUpcomingSection)
-    .append(displaySearch);
-
-  $("form#search-games").submit((event) => {
-    event.preventDefault();
-
-    let gametitle = $("#search").val();
-
-    getTitle(gametitle);
-  });
-
-  $(".main-menu-item").click(function () {
-    getList(this.id);
-  });
+function handleRender() {
+  handleUpcoming();
+  submitSearchByTitle();
+  handleListButton();
 }
 
-$(render);
+$(handleRender);

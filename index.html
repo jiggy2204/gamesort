@@ -14,10 +14,52 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div id="card-popup" class="hidden"></div>
-    <header class="homepage-header">
-      <h1>Game Organizer</h1>
-    </header>
+    <div id="app">
+      <header class="homepage-header">
+        <h1>Game Organizer</h1>
+      </header>
+      <section id="menu-boxes">
+        <!--WISHLIST-->
+        <div id="wishlist" class="main-menu-item">
+          <p>WISHLIST</p>
+          <ul id="js-wishlist-list"></ul>
+        </div>
+
+        <!--COLLECTIONS-->
+        <div id="collection" class="main-menu-item">
+          <p>COLLECTIONS</p>
+          <ul id="js-collection-list"></ul>
+        </div>
+      </section>
+      <section id="storeInfo">
+        
+      </section>
+      <!--UPCOMING GAMES TOP 10-->
+      <section id="upcoming">
+        <h2>Top 10 Upcoming Games</h2>
+        <h4>Add these games to your wishlist!</h4>
+        <div class="js-upcoming-list" id="upcoming-list"></div>
+      </section>
+      <!--SEARCH BAR-->
+      <section id="search-bar">
+        <form id="search-games">
+          <label for="search">ENTER TITLE:</label><br />
+          <input id="search" type="text" name="gametitle" />
+
+          <input
+            id="searchBtn"
+            form="search-games"
+            type="submit"
+            class="btn search-btn"
+            value="SEARCH"
+          />
+        </form>
+      </section>
+      <div id="results" class="hidden">
+        <h2>Search Results</h2>
+        <ul id="search-results"></ul>
+      </div>
+    </div>
   </body>
   <script
     src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
