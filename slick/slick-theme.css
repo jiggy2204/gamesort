@@ -57,7 +57,7 @@
   font-family: "slick";
   font-size: 20px;
   line-height: 1;
-  color: #1EFC1E;
+  color: #1efc1e;
   opacity: 0.75;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -111,7 +111,7 @@
   padding: 0;
   margin: 0;
   width: 100vw;
-  margin-left: -11%;
+  margin-left: -13%;
 }
 
 .slick-dots li {
@@ -157,14 +157,14 @@
   font-size: 6px;
   line-height: 20px;
   text-align: center;
-  color: #1EFC1E;
+  color: #1efc1e;
   opacity: 0.25;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 .slick-dots li.slick-active button:before {
-  color: #1EFC1E;
+  color: #1efc1e;
   opacity: 0.75;
 }
 /*# sourceMappingURL=slick-theme.css.map */

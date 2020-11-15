@@ -20,9 +20,12 @@ body {
 }
 
 h1 {
-  color: $green;
-  font-weight: 300;
-  margin-left: 5%;
+  color: $ltBlue;
+  background-color: #000;
+  font-weight: 600;
+  margin: 0;
+  text-align: center;
+  padding: 10px 0;
 }
 
 h2 {
@@ -32,7 +35,7 @@ h2 {
 }
 
 h3 {
-  color: $dkBlue;
+  color: $green;
   font-weight: 600;
   text-transform: uppercase;
 }
@@ -50,199 +53,108 @@ hr {
 }
 
 .btn {
+  background-color: $green;
   border: none;
   box-shadow: none;
-  background: green;
-  padding: 10px 25px;
-  color: #fff;
+  padding: 5px 10px;
+  color: $black;
+}
 
-  &.prevBtn,
-  &.nextBtn {
-    margin-top: 2%;
+#app {
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background-color: $green;
+  margin: 0;
+}
+
+#menu-boxes {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  background-color: $dkBlue;
+  margin-bottom: 5%;
+
+  .main-menu-item {
+    text-align: center;
+    padding: 20px 0px;
+    width: 50%;
   }
 }
 
-label {
-  display: block;
-}
-
-input {
-  height: 37px;
-}
-
-a {
-  text-decoration: none;
-}
-
-li {
-  list-style-type: none;
-}
-
-img {
-  width: 100%;
-  height: auto;
-}
-
 #upcoming {
-  padding: 0 15px;
-  margin-bottom: 15%;
+  margin: 0 auto;
+  padding: 0;
+  width: 80%;
 
   h4 {
     margin-bottom: 5%;
   }
 
-  #upcoming-list {
-    width: 90%;
-    margin: 5% auto;
+  .upcomingCard {
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
 
-    #nextPage,
-    #prevPage {
-      cursor: pointer;
-    }
+    .card-header {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: flex-start;
+      width: 50%;
+      padding: 10px;
+      background-color: rgba($color: $black, $alpha: 0.75);
 
-    .upcoming-card {
-      width: 300px;
-      height: 250px;
-      background-image: cover;
-
-      .card-text {
-        width: 100%;
-        font-size: 16px;
-        padding: 12px 0px 12px 5px;
-        position: absolute;
-        bottom: 0;
-        background-color: $dkBlue;
+      img {
+        width: 25px;
+        margin-right: 5%;
       }
     }
 
-    .js-upcoming-list {
-      padding: 15px;
-    }
-  }
-}
-
-#menu-boxes {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  margin-bottom: 5%;
-
-  .main-menu-item {
-    padding: 25px 15px;
-    margin: 2%;
-    flex: 1;
-    text-align: center;
-    border-radius: 15px;
-    border: 1px solid $green;
-
-    &.selected {
-      background-color: $green;
-    }
-
-    &:active {
-      background-color: $green;
+    .card-footer {
+      position: absolute;
+      bottom: 0;
+      line-height: 24px;
+      background-color: $ltBlue;
+      padding: 10px;
+      width: 100%;
     }
   }
 }
 
 #search-bar {
-  display: block;
-  margin-left: 5%;
-  margin-bottom: 5%;
-}
+  margin-left: 10%;
 
-#results {
-  h2 {
-    margin-left: 5%;
-  }
-
-  #search-results {
-    padding: 0 15px;
-
-    .card {
-      width: 100%;
-      margin: 7% auto;
-      box-shadow: 0px 0px 15px #000;
-
-      .bg-darken {
-        background-color: rgba($color: $black, $alpha: 0.5);
-      }
-
-      .card-info {
-        position: relative;
-        margin-left: 5%;
-        top: 0;
-
-        p {
-          padding-top: 10px;
-        }
-      }
-
-      .sorting-area {
-        display: flex;
-
-        .addBtn {
-          background-color: $dkBlue;
-          font-weight: 300;
-          margin: 5% 2%;
-          box-shadow: 3px 3px 25px $black;
-
-          &:active {
-            background-color: $ltBlue;
-          }
-        }
-      }
-    }
+  input {
+    height: 40px;
   }
 }
 
-#card-popup {
-  z-index: 1000;
-  display: hidden;
-  position: fixed;
-  top: 0;
-  background-color: rgba($color: $black, $alpha: 0.5);
+#search-results {
   width: 100%;
-  height: 100vh;
-  overflow: hidden;
 
-  .popupContent {
+  .searchCard {
     width: 100%;
-    position: relative;
-    margin-top: 50%;
-    transform: translateY(50%);
+    box-shadow: 0px 0px 15px #000;
 
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      padding: 5%;
-      margin-bottom: 7%;
-      h3 {
-        color: #fff;
-        font-weight: 600;
-      }
-
-      img {
-        width: 30px;
-        margin: 0 2%;
-      }
+    .bg-darken {
+      background-color: rgba($color: $black, $alpha: 0.5);
     }
 
-    .sorting-area {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
+    .card-info {
+      position: relative;
+      margin-left: 5%;
+      top: 0;
 
-      .addBtn {
-        width: 45%;
-        background-color: $dkBlue;
-        box-shadow: 5px 5px 15px $black;
-
-        &:active {
-          background-color: $ltBlue;
-        }
+      p {
+        padding-top: 10px;
       }
     }
   }
+}
+
+#mainFooter {
+  margin: 10% auto;
 }

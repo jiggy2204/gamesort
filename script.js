@@ -2,58 +2,29 @@ const urlGames = "https://api.rawg.io/api/games";
 const urlDevs = "https://api.rawg.io/api/developers";
 const urlPubs = "https://api.rawg.io/api/publishers";
 const urlPlats = "https://api.rawg.io/api/platforms";
-const urlGenres = "https://api.rawg.io/api/genres";
-const urlStores = "https://api.rawg.io/api/stores";
+//const urlStores = "https://api.rawg.io/api/stores";
 const apiKey = "7116511b911644eb964c5cb368954192";
 
-function testApi() {
-  const params = {
-    key: apiKey,
-    page_size: 10,
-  };
+var wishlist = [];
+var collection = [
+  {
+    id: "",
+    bgImage: "",
+    releaseDate: "",
+    developer: "",
+    developerId: "",
+    publisher: "",
+    publisherId: "",
+    platforms: [],
+  },
+];
 
-  const queryString = formatQueryParams(params);
-  const url = "?" + queryString;
-
-  //   fetch(urlStores + url)
-  //     .then((response) => response.json())
-  //     .then((responseJson) => {
-  //       responseJson.results.map((e, i) => {
-  //         console.log(e.name);
-  //       });
-  //     });
-
-  //   fetch(urlDevs + url)
-  //     .then((response) => response.json())
-  //     .then((responseJson) => {
-  //       responseJson.results.map((e, i) => {
-  //         console.log(e.name);
-  //       });
-  //     });
-
-  //   fetch(urlPubs + url)
-  //     .then((response) => response.json())
-  //     .then((responseJson) => {
-  //       responseJson.results.map((e, i) => {
-  //         console.log(e.name);
-  //       });
-  //     });
-
-  //   fetch(urlPlats + url)
-  //     .then((response) => response.json())
-  //     .then((responseJson) => {
-  //       responseJson.results.map((e, i) => {
-  //         console.log(e.name);
-  //       });
-  //     });
-}
-
-// testApi();
-
+// format query paramters for api calls
 function formatQueryParams(params) {
   const queryItems = Object.keys(params).map(
     (key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`
   );
+
   return queryItems.join("&");
 }
 
@@ -64,131 +35,263 @@ Date.prototype.addDays = function (days) {
   return date;
 };
 
-function displayTitleSearch(responseJson) {
-  $("#search-results").empty();
-
-  console.log(responseJson);
-
-  responseJson.results.map((game, idx) => {
-    let inputDate = new Date(game.released);
-    let formattedDate =
-      inputDate.getMonth() +
-      1 +
-      "/" +
-      inputDate.getDate() +
-      "/" +
-      inputDate.getFullYear();
-
-    let image = "";
-
-    if (game.background_image !== null) {
-      image = `<img class="card-img" src="${game.background_image}">`;
-    }
-
-    $("#search-results").append(`
-            <li>
-                <div id="${game.slug}" class="card">
-
-                <div class="bg-darken">
-                    ${image}
-
-                    <div class='card-info'>
-                        <p class='card-name'>${game.name}</p>
-                        <p class='release-date'>Release Date: ${formattedDate}</p>
-                    </div>
-
-                    <div id="sorting" class="sorting-area">
-                        <button class="btn addBtn">ADD TO COLLECTION</button>
-                        <button class="btn addBtn">ADD TO WISHLIST</button>
-                    
-                    </div>
-                
-                </div>
-
-                </div>
-            </li>
-        `);
-  });
-
-  if (responseJson.previous !== null) {
-    $("#search-results").append(
-      `<button class='btn prevBtn' id='prevPage'>PREV</button>`
-    );
-    $("#prevPage").click(function () {
-      getPrev(responseJson.previous);
-    });
-  }
-
-  if (responseJson.next !== null) {
-    $("#search-results").append(
-      `<button class='btn nextBtn' id='nextPage'>NEXT</button>`
-    );
-    $("#nextPage").click(function () {
-      getNext(responseJson.next);
-    });
-  }
-
-  $("#results").css("display", "block");
-}
-
-function getNext(nextPage) {
-  fetch(nextPage)
-    .then((response) => response.json())
-    .then((responseJson) => displayTitleSearch(responseJson));
-}
-
-function getPrev(prevPage) {
-  fetch(prevPage)
-    .then((response) => response.json())
-    .then((responseJson) => displayTitleSearch(responseJson));
-}
-
-function getTitle(gametitle) {
+function getSearchResults(games) {
   const params = {
     key: apiKey,
-    search: gametitle,
     page_size: 5,
+    search: games,
+  };
+
+  const queryString = formatQueryParams(params);
+
+  const url = urlGames + "?" + queryString;
+
+  fetch(url)
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(response.statusText);
+    })
+    .then((responseJson) => {
+      console.log(responseJson);
+      displaySearchResults(responseJson);
+    })
+    .catch((err) => {
+      $(`#js-error-message`).text(`Something went wrong: ${err.message}`);
+    });
+}
+
+function displaySearchResults(responseJson) {
+  $("#search-results").empty();
+
+  $("#results").removeClass("hidden");
+  for (let i = 0; i < responseJson.results.length; i++) {
+    for (let j = 0; j < responseJson.results[i].platforms.length; i++) {
+      let image = "";
+
+      if (game.background_image !== null) {
+        image = `<img class="card-img" src="${responseJson.results[i].background_image}">`;
+      }
+
+      $("#search-results").append(`
+          <li>
+            <div id="${responseJson.results[i].slug}" class="card searchCard">
+              <div class="bg-darken">
+
+                  ${image}
+
+                  <div class='card-info'>
+                      <p class='card-name'>${responseJson.results[i].name}</p>
+                      <div id="card-platforms" class="platforms"><ul id="js-platform-list"></ul></div>
+                  </div>
+
+                  <div id="sorting" class="sorting-area">
+                      <button class="btn addBtn">ADD TO COLLECTION</button>
+                      <button class="btn addBtn">ADD TO WISHLIST</button>
+                  
+                  </div>
+              
+              </div>
+            </div>
+          </li>
+      `);
+
+      $("#js-platform-list").append(
+        `<li>${responseJson.results[i].platforms[j].name}</li>`
+      );
+
+      console.log(responseJson.results[i].platforms[j]);
+    }
+  }
+
+  //PREV BUTTON EVENT LISTENER
+  if (responseJson.previous != null) {
+    $("#resultsNav").append(`
+    <button id='resultPrev' class='btn resultPrevBtn'>PREV</button>`);
+
+    $("#resultPrev").click((event) => {
+      event.preventDefault();
+
+      getPrevPage(responseJson.previous);
+    });
+  }
+
+  //NEXT BUTTON EVENT LISTENER
+  if (responseJson.next != null) {
+    $("#resultsNav").append(`
+    <button id='resultNext' class='btn resultNextBtn'>NEXT</button>`);
+
+    $("#resultNext").click((event) => {
+      event.preventDefault();
+
+      getNextPage(responseJson.next);
+    });
+  }
+}
+
+//Get Next and Previous pages of Search
+
+//PREV PAGE
+function getPrevPage(prevPage) {
+  fetch(prevPage)
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(response.statusText);
+    })
+    .then((responseJson) => {
+      displayGames(responseJson);
+    })
+    .catch((err) => {
+      $(`#js-error-message`).text(`Something went wrong: ${err.message}`);
+    });
+}
+
+//NEXT PAGE
+function getNextPage(nextPage) {
+  fetch(nextPage)
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+    })
+    .then((responseJson) => {
+      displayGames(responseJson);
+    })
+    .catch((err) => {
+      $(`#js-error-message`).text(`Something went wrong: ${err.message}`);
+    });
+}
+
+function getDevs() {
+  const params = {
+    key: apiKey,
+    page_size: 5,
+  };
+
+  const queryString = formatQueryParams(params);
+
+  const url = urlDevs + "?" + queryString;
+
+  fetch(url)
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(response.statusText);
+    })
+    .then((responseJson) => {
+      return responseJson;
+    })
+    .catch((err) => {
+      $(`#js-error-message`).text(`Something went wrong: ${err.message}`);
+    });
+}
+
+function getPubs() {
+  const params = {
+    key: apiKey,
+    page_size: 5,
+  };
+
+  const queryString = formatQueryParams(params);
+
+  const url = urlPubs + "?" + queryString;
+
+  fetch(url)
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(response.statusText);
+    })
+    .then((responseJson) => {
+      return responseJson;
+    })
+    .catch((err) => {
+      $(`#js-error-message").text("Something went wrong: ${err.message}`);
+    });
+}
+
+//SUBMIT SEARCH BASED ON TITLE
+function handleSearchForm() {
+  $("form").submit((event) => {
+    event.preventDefault();
+    const game = $("#js-search-term").val();
+    getSearchResults(game);
+  });
+}
+
+function handleUpcomingGames() {
+  let releaseDate = new Date().addDays(365 / 2);
+  let endDate = releaseDate.toJSON().split("T");
+
+  let currentDate = new Date();
+  let beginDate = currentDate.toJSON().split("T");
+
+  let dateRange = beginDate[0] + "," + endDate[0];
+
+  const params = {
+    key: apiKey,
+    ordering: "-added,rating",
+    dates: dateRange,
+    page_size: 10,
   };
 
   const queryString = formatQueryParams(params);
   const url = urlGames + "?" + queryString;
 
   fetch(url)
-    .then((response) => response.json())
-    .then((responseJson) => displayTitleSearch(responseJson))
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(response.statusText);
+    })
+    .then((responseJson) => {
+      return displayUpcomingGames(responseJson);
+    })
     .catch((err) => {
-      $("#js-error-message").text(`Something went wrong: ${err.message}`);
+      $(`#js-error-message`).text(`Something went wrong: ${err.message}`);
     });
 }
 
-function submitSearchByTitle() {
-  $("form#search-games").submit((event) => {
-    event.preventDefault();
-
-    let gametitle = $("#search").val();
-
-    getTitle(gametitle);
-  });
-}
-
-function displayUpcoming(responseJson) {
+function displayUpcomingGames(responseJson) {
   responseJson.results.map((e, idx) => {
-    //convert release date to MM/DD/YYYY format
-    let inputDate = new Date(e.released);
-    let formattedDate =
-      inputDate.getMonth() +
-      1 +
-      "/" +
-      inputDate.getDate() +
-      "/" +
-      inputDate.getFullYear();
+    //FORMAT RELEASE DATE
+    let parsing = e.released.split("-");
 
-    $("#upcoming-list").append(
-      `<div class="upcoming-card" id="${e.slug}" style="background:url('${e.background_image}');background-size:cover;background-position:center;"><div class='card-text'><p>${e.name}</p><p>Release Date: ${formattedDate}</p></div></div>`
-    );
+    let getReleaseDate = {
+      year: parsing[0],
+      month: parsing[1],
+      day: parsing[2],
+    };
+
+    let formattedDate =
+      getReleaseDate.month +
+      "/" +
+      getReleaseDate.day +
+      "/" +
+      getReleaseDate.year;
+
+    //RETURN UPCOMING CARDS
+    $("#js-upcoming-list").append(`
+     <div id='${e.slug}' class='card upcomingCard' style='background:url("${e.background_image}");background-size:cover;'>
+        <div class='card-header'>
+          <img class="addWish" src='./images/icon_addCard.png' />
+          <p>Add To Wishlist</p>
+        </div>
+        <div class='card-footer'>
+          <p>${e.name}</p>
+          <p>Release Date: ${formattedDate}</p>
+        </div>
+     </div>
+   `);
   });
 
-  $(".js-upcoming-list").slick({
+  $(".upcoming-list").slick({
     dots: true,
     infinite: false,
     speed: 300,
@@ -225,70 +328,59 @@ function displayUpcoming(responseJson) {
   });
 }
 
-function handleUpcoming() {
-  let beginDate = new Date();
-  let endDate = new Date().addDays(90);
+function renderHomepage() {
+  $("#app").append(`<header class="homepage-header">
+        <h1>Video Game Organizer</h1>
+      </header>
+      <section id="menu-boxes">
+        <!--WISHLIST-->
+        <div id="wishlist" class="main-menu-item">
+          <p>WISHLIST</p>
+          <ul id="js-wishlist-list"></ul>
+        </div>
 
-  let beginDay = beginDate.toJSON().split("T");
-  let endDay = endDate.toJSON().split("T");
+        <!--COLLECTIONS-->
+        <div id="collection" class="main-menu-item">
+          <p>COLLECTION</p>
+        </div>
+      </section>
+      <section class="list hidden" id="">
+        <h3 class="group-title"></h3>
+        <ul id="js-return-list"></li>
+      </section>
+      <!--UPCOMING GAMES TOP 10-->
+      <section id="upcoming">
+        <h2>Most Anticipated</h2>
+        <h4>Add these games to your wishlist!</h4>
+        <div id="js-upcoming-list" class="upcoming-list"></div>
+      </section>
+      <!--SEARCH BAR-->
+      <section id="search-bar">
+        <form id="search-games">
+          <label for="search">ENTER TITLE:</label><br />
+          <input id="js-search-term" type="text" name="gametitle" required/>
 
-  let dateRange = beginDay[0] + "," + endDay[0];
-
-  const params = {
-    key: apiKey,
-    ordering: "-rating",
-    dates: dateRange,
-    page_size: 10,
-  };
-
-  const queryString = formatQueryParams(params);
-  const url = urlGames + "?" + queryString;
-
-  fetch(url)
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error(response.statusText);
-    })
-    .then((responseJson) => displayUpcoming(responseJson))
-    .catch((err) => {
-      $("#js-error-message").text(`Something went wrong: ${err.message}`);
-    });
-}
-
-function displayList(type) {
-  $(".list").append(`
-    <h3>${type}</h3>
-    <ul></li>
-  `);
-}
-
-function handleListButton() {
-  $(".main-menu-item").click(function (e) {
-    e.preventDefault();
-    handleList(this.id);
-  });
-}
-
-function handleList(listButton) {
-  $(".main-menu-item").removeClass("selected");
-  $("#" + listButton).addClass("selected");
-
-  $("#upcoming").remove();
-  $("#search-bar").remove();
-  $(".list").remove();
-
-  displayList(listButton);
-
-  return $("#menu-boxes").after(`<section class="list" id="${listButton}-list">
-    </section>`);
+          <input
+            id="searchBtn"
+            type="submit"
+            class="btn search-btn"
+            value="SEARCH"
+          />
+        </form>
+      </section>
+      <div id="results" class="hidden">
+        <h2>Search Results</h2>
+        <ul id="search-results"></ul>
+        <div id="resultsNav"></div>
+      </div>
+      <div id="mainFooter"></div>
+      `);
 }
 
 function handleRender() {
-  handleUpcoming();
-  submitSearchByTitle();
-  handleListButton();
+  renderHomepage();
+  handleSearchForm();
+  handleUpcomingGames();
 }
 
 $(handleRender);
