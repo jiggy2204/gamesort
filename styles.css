@@ -39,6 +39,10 @@ hr {
   margin: 10%;
 }
 
+li {
+  list-style: none;
+}
+
 .hidden {
   display: none;
 }
@@ -137,28 +141,96 @@ header {
   height: 40px;
 }
 
-#search-results {
+#results h2 {
+  margin: 5% 10%;
+}
+
+#results #search-results {
   width: 100%;
 }
 
-#search-results .searchCard {
-  width: 100%;
+#results #search-results li {
+  margin-top: 5%;
+}
+
+#results #search-results .searchCard {
+  width: 90%;
+  margin: 0 auto;
   -webkit-box-shadow: 0px 0px 15px #000;
           box-shadow: 0px 0px 15px #000;
 }
 
-#search-results .searchCard .bg-darken {
+#results #search-results .searchCard .bg-darken {
   background-color: rgba(37, 36, 34, 0.5);
 }
 
-#search-results .searchCard .card-info {
+#results #search-results .searchCard .bg-darken img {
+  width: 100%;
+  height: auto;
+}
+
+#results #search-results .searchCard .bg-darken .platforms {
+  margin-top: -5%;
+  margin-bottom: 5%;
+}
+
+#results #search-results .searchCard .bg-darken .platforms #js-platform-list {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+}
+
+#results #search-results .searchCard .bg-darken .platforms #js-platform-list li {
+  background-color: #000;
+  padding: 10px;
+  border-radius: 25px;
+}
+
+#results #search-results .searchCard .bg-darken .card-info {
   position: relative;
-  margin-left: 5%;
   top: 0;
 }
 
-#search-results .searchCard .card-info p {
-  padding-top: 10px;
+#results #search-results .searchCard .bg-darken .card-info #card-text {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+}
+
+#results #search-results .searchCard .bg-darken .card-info #card-text p {
+  padding: 10px;
+}
+
+#results #search-results .searchCard .bg-darken .sorting-area {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: 100%;
+  margin-top: 2%;
+}
+
+#results #search-results .searchCard .bg-darken .sorting-area .btn {
+  width: 50%;
+  background-color: #009fb7;
+  color: #fff;
+  padding: 10px;
+}
+
+#results #resultsNav {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+  margin-top: 15%;
 }
 
 #mainFooter {

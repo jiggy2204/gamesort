@@ -1,20 +1,21 @@
 const urlGames = "https://api.rawg.io/api/games";
-const urlDevs = "https://api.rawg.io/api/developers";
-const urlPubs = "https://api.rawg.io/api/publishers";
-const urlPlats = "https://api.rawg.io/api/platforms";
-//const urlStores = "https://api.rawg.io/api/stores";
 const apiKey = "7116511b911644eb964c5cb368954192";
 
-var wishlist = [];
+var wishlist = [
+  {
+    id: "",
+    bgImage: "",
+    releaseDate: "",
+    genres: [],
+    platforms: [],
+  },
+];
 var collection = [
   {
     id: "",
     bgImage: "",
     releaseDate: "",
-    developer: "",
-    developerId: "",
-    publisher: "",
-    publisherId: "",
+    genres: [],
     platforms: [],
   },
 ];
@@ -54,7 +55,6 @@ function getSearchResults(games) {
       throw new Error(response.statusText);
     })
     .then((responseJson) => {
-      console.log(responseJson);
       displaySearchResults(responseJson);
     })
     .catch((err) => {
@@ -64,46 +64,83 @@ function getSearchResults(games) {
 
 function displaySearchResults(responseJson) {
   $("#search-results").empty();
+  $("#resultsNav").remove();
 
   $("#results").removeClass("hidden");
+
+  let cardId = "";
+
   for (let i = 0; i < responseJson.results.length; i++) {
-    for (let j = 0; j < responseJson.results[i].platforms.length; i++) {
-      let image = "";
+    cardId = responseJson.results[i].slug;
 
-      if (game.background_image !== null) {
-        image = `<img class="card-img" src="${responseJson.results[i].background_image}">`;
-      }
+    let parsing = responseJson.results[i].released.split("-");
 
-      $("#search-results").append(`
-          <li>
-            <div id="${responseJson.results[i].slug}" class="card searchCard">
-              <div class="bg-darken">
+    let getReleaseDate = {
+      year: parsing[0],
+      month: parsing[1],
+      day: parsing[2],
+    };
 
-                  ${image}
+    let formattedDate =
+      getReleaseDate.month +
+      "/" +
+      getReleaseDate.day +
+      "/" +
+      getReleaseDate.year;
 
-                  <div class='card-info'>
-                      <p class='card-name'>${responseJson.results[i].name}</p>
-                      <div id="card-platforms" class="platforms"><ul id="js-platform-list"></ul></div>
-                  </div>
+    let image = "";
 
-                  <div id="sorting" class="sorting-area">
-                      <button class="btn addBtn">ADD TO COLLECTION</button>
-                      <button class="btn addBtn">ADD TO WISHLIST</button>
-                  
-                  </div>
-              
-              </div>
-            </div>
-          </li>
-      `);
-
-      $("#js-platform-list").append(
-        `<li>${responseJson.results[i].platforms[j].name}</li>`
-      );
-
-      console.log(responseJson.results[i].platforms[j]);
+    if (responseJson.results[i].background_image !== null) {
+      image = `<img class="card-img" src="${responseJson.results[i].background_image}">`;
     }
+
+    $("#search-results").append(`
+            <li>
+              <div id="${cardId}" class="card searchCard">
+                <div class="bg-darken">
+  
+                    ${image}
+  
+                    <div class='card-info'>
+
+                        <div id="card-text">
+                          <p class='card-name'>${
+                            responseJson.results[i].name
+                          }</p>
+                          <p class='card-name'>Release Date: ${formattedDate}</p>
+                        </div>
+                        <div id="card-platforms" class="platforms">
+                        <ul id="js-platform-list">
+                        ${getPlat(responseJson.results[i].platforms)}
+                        </ul>
+                      </div>
+                    </div>
+  
+                    <div id="sorting" class="sorting-area">
+                        <button id="coll-Btn" class="btn addBtn">ADD TO COLLECTION</button>
+                        <button id="wish-Btn" class="btn addBtn">ADD TO WISHLIST</button>
+                    
+                    </div>
+                
+                </div>
+              </div>
+            </li>
+        `);
   }
+
+  $("button").click((event) => {
+    event.stopPropagation();
+
+    let card = $(event.currentTarget).closest("li").children("div").attr("id");
+
+    if ($(event.currentTarget).attr("id") === "coll-Btn") {
+      checkIfCollected(card);
+    } else if ($(event.currentTarget).attr("id") === "wish-Btn") {
+      checkIfWishlisted(card);
+    }
+  });
+
+  $("#results").append(`<div id="resultsNav"></div>`);
 
   //PREV BUTTON EVENT LISTENER
   if (responseJson.previous != null) {
@@ -113,7 +150,7 @@ function displaySearchResults(responseJson) {
     $("#resultPrev").click((event) => {
       event.preventDefault();
 
-      getPrevPage(responseJson.previous);
+      getPage(responseJson.previous);
     });
   }
 
@@ -125,16 +162,24 @@ function displaySearchResults(responseJson) {
     $("#resultNext").click((event) => {
       event.preventDefault();
 
-      getNextPage(responseJson.next);
+      getPage(responseJson.next);
     });
   }
 }
+// Get Platform List
 
+function getPlat(platforms) {
+  let listItems = [];
+  for (let j = 0; j < platforms.length; j++) {
+    listItems.push(`<li>${platforms[j].platform.name}</li>`);
+  }
+  return listItems.join("");
+}
 //Get Next and Previous pages of Search
 
-//PREV PAGE
-function getPrevPage(prevPage) {
-  fetch(prevPage)
+//NEXT & PREV PAGE
+function getPage(nav) {
+  fetch(nav)
     .then((response) => {
       if (response.ok) {
         return response.json();
@@ -142,38 +187,71 @@ function getPrevPage(prevPage) {
       throw new Error(response.statusText);
     })
     .then((responseJson) => {
-      displayGames(responseJson);
+      displaySearchResults(responseJson);
     })
     .catch((err) => {
       $(`#js-error-message`).text(`Something went wrong: ${err.message}`);
     });
 }
 
-//NEXT PAGE
-function getNextPage(nextPage) {
-  fetch(nextPage)
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-    })
-    .then((responseJson) => {
-      displayGames(responseJson);
-    })
-    .catch((err) => {
-      $(`#js-error-message`).text(`Something went wrong: ${err.message}`);
-    });
+//Display Collection
+
+function displayCollection() {
+  $(".list")
+    .removeClass("hidden")
+    .addClass("collection-group")
+    .setAttr("id", "collection");
 }
 
-function getDevs() {
+//Add to wish or regular collection
+
+function checkIfCollected(card) {
+  //Iterate over collection array and check against object id
+  for (let i = 0; i < collection.length; i++) {
+    //Check if card is in collection
+    if (collection[i].id === card) {
+      return alert("This card already exists in collection");
+    }
+
+    if (collection[i].id !== card) {
+      alert("adding!");
+      addToCollection(card);
+    }
+  }
+}
+
+function checkIfWishlisted(card) {
+  //Iterate over collection array and check against object id
+  for (let i = 0; i < collection.length; i++) {
+    //Check if card is in collection
+    if (collection[i].id === card) {
+      return alert("This card already exists in collection");
+    }
+
+    if (collection[i].id !== card) {
+      alert("wished!");
+      addToWishlist(card);
+    }
+  }
+}
+
+function addToCollection(card) {
+  let newObject = {
+    id: "",
+    bgImage: "",
+    releaseDate: "",
+    genres: [],
+    platforms: [],
+  };
+
   const params = {
     key: apiKey,
-    page_size: 5,
+    search: card,
   };
 
   const queryString = formatQueryParams(params);
 
-  const url = urlDevs + "?" + queryString;
+  const url = urlGames + "?" + queryString;
 
   fetch(url)
     .then((response) => {
@@ -183,39 +261,85 @@ function getDevs() {
       throw new Error(response.statusText);
     })
     .then((responseJson) => {
-      return responseJson;
-    })
-    .catch((err) => {
-      $(`#js-error-message`).text(`Something went wrong: ${err.message}`);
-    });
-}
+      for (let i = 0; i < responseJson.results.length; i++) {
+        if (responseJson.results[i].slug === card) {
+          newObject.id = card;
+          newObject.bgImage = responseJson.results[i].background_image;
+          newObject.releaseDate = responseJson.results[i].released;
 
-function getPubs() {
-  const params = {
-    key: apiKey,
-    page_size: 5,
-  };
+          let platforms = responseJson.results[i].platforms;
+          for (let j = 0; j < platforms.length; j++) {
+            newObject.platforms.push(platforms[j].platform.name);
+          }
 
-  const queryString = formatQueryParams(params);
-
-  const url = urlPubs + "?" + queryString;
-
-  fetch(url)
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
+          let genres = responseJson.results[i].genres;
+          for (let k = 0; k < genres.length; k++) {
+            newObject.genres.push(genres[k].name);
+          }
+        }
       }
-      throw new Error(response.statusText);
-    })
-    .then((responseJson) => {
-      return responseJson;
     })
     .catch((err) => {
       $(`#js-error-message").text("Something went wrong: ${err.message}`);
     });
+  collection.push(newObject);
+  return collection;
+}
+
+function addToWishlist(card) {
+  let newObject = {
+    id: "",
+    bgImage: "",
+    releaseDate: "",
+    genres: [],
+    platforms: [],
+  };
+
+  const params = {
+    key: apiKey,
+    search: card,
+  };
+
+  const queryString = formatQueryParams(params);
+
+  const url = urlGames + "?" + queryString;
+
+  fetch(url)
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(response.statusText);
+    })
+    .then((responseJson) => {
+      for (let i = 0; i < responseJson.results.length; i++) {
+        if (responseJson.results[i].slug === card) {
+          newObject.id = card;
+          newObject.bgImage = responseJson.results[i].background_image;
+          newObject.releaseDate = responseJson.results[i].released;
+
+          let platforms = responseJson.results[i].platforms;
+          for (let j = 0; j < platforms.length; j++) {
+            newObject.platforms.push(platforms[j].platform.name);
+          }
+
+          let genres = responseJson.results[i].genres;
+          for (let k = 0; k < genres.length; k++) {
+            newObject.genres.push(genres[k].name);
+          }
+        }
+      }
+    })
+    .catch((err) => {
+      $(`#js-error-message").text("Something went wrong: ${err.message}`);
+    });
+
+  wishlist.push(newObject);
+  return wishlist;
 }
 
 //SUBMIT SEARCH BASED ON TITLE
+//These are the inital renders for mobile and up
 function handleSearchForm() {
   $("form").submit((event) => {
     event.preventDefault();
@@ -371,7 +495,6 @@ function renderHomepage() {
       <div id="results" class="hidden">
         <h2>Search Results</h2>
         <ul id="search-results"></ul>
-        <div id="resultsNav"></div>
       </div>
       <div id="mainFooter"></div>
       `);
