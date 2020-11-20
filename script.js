@@ -114,14 +114,7 @@ function displaySearchResults(responseJson) {
                         ${getPlat(responseJson.results[i].platforms)}
                         </ul>
                       </div>
-                    </div>
-  
-                    <div id="sorting" class="sorting-area">
-                        <button id="coll-Btn" class="btn addBtn">ADD TO COLLECTION</button>
-                        <button id="wish-Btn" class="btn addBtn">ADD TO WISHLIST</button>
-                    
-                    </div>
-                
+                    </div>                
                 </div>
               </div>
             </li>
@@ -402,11 +395,7 @@ function displayUpcomingGames(responseJson) {
 
     //RETURN UPCOMING CARDS
     $("#js-upcoming-list").append(`
-     <div id='${e.slug}' class='card upcomingCard' style='background:url("${e.background_image}");background-size:cover;'>
-        <div class='card-header'>
-          <img class="addWish" src='./images/icon_addCard.png' />
-          <p>Add To Wishlist</p>
-        </div>
+     <div id='${e.slug}' class='card upcomingCard' style='background:url("${e.background_image}");background-size:cover;background-position:center;'>
         <div class='card-footer'>
           <p>${e.name}</p>
           <p>Release Date: ${formattedDate}</p>
@@ -423,7 +412,7 @@ function displayUpcomingGames(responseJson) {
     slidesToScroll: 4,
     responsive: [
       {
-        breakpoint: 1024,
+        breakpoint: 1280,
         settings: {
           slidesToShow: 3,
           slidesToScroll: 3,
@@ -432,7 +421,7 @@ function displayUpcomingGames(responseJson) {
         },
       },
       {
-        breakpoint: 600,
+        breakpoint: 768,
         settings: {
           slidesToShow: 2,
           slidesToScroll: 2,
@@ -454,20 +443,8 @@ function displayUpcomingGames(responseJson) {
 
 function renderHomepage() {
   $("#app").append(`<header class="homepage-header">
-        <h1>Video Game Organizer</h1>
+        <h1>Video Game Search Engine</h1>
       </header>
-      <section id="menu-boxes">
-        <!--WISHLIST-->
-        <div id="wishlist" class="main-menu-item">
-          <p>WISHLIST</p>
-          <ul id="js-wishlist-list"></ul>
-        </div>
-
-        <!--COLLECTIONS-->
-        <div id="collection" class="main-menu-item">
-          <p>COLLECTION</p>
-        </div>
-      </section>
       <section class="list hidden" id="">
         <h3 class="group-title"></h3>
         <ul id="js-return-list"></li>

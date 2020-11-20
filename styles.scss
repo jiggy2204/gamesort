@@ -70,22 +70,8 @@ li {
 }
 
 header {
-  background-color: $green;
   margin: 0;
-}
-
-#menu-boxes {
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-  background-color: $dkBlue;
-  margin-bottom: 5%;
-
-  .main-menu-item {
-    text-align: center;
-    padding: 20px 0px;
-    width: 50%;
-  }
+  margin-bottom: 7%;
 }
 
 #upcoming {
@@ -101,21 +87,6 @@ header {
     width: 100%;
     height: 250px;
     overflow: hidden;
-
-    .card-header {
-      display: flex;
-      flex-wrap: nowrap;
-      align-items: center;
-      justify-content: flex-start;
-      width: 50%;
-      padding: 10px;
-      background-color: rgba($color: $black, $alpha: 0.75);
-
-      img {
-        width: 25px;
-        margin-right: 5%;
-      }
-    }
 
     .card-footer {
       position: absolute;
@@ -169,6 +140,7 @@ header {
             display: flex;
             justify-content: space-around;
             flex-wrap: wrap;
+            padding-bottom: 5%;
 
             li {
               background-color: #000;
@@ -192,19 +164,6 @@ header {
             }
           }
         }
-
-        .sorting-area {
-          display: flex;
-          width: 100%;
-          margin-top: 2%;
-
-          .btn {
-            width: 50%;
-            background-color: $ltBlue;
-            color: #fff;
-            padding: 10px;
-          }
-        }
       }
     }
   }
@@ -218,4 +177,90 @@ header {
 
 #mainFooter {
   margin: 10% auto;
+}
+
+@media screen and (min-width: 600px) {
+  #search-results {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+
+    li {
+      width: 49%;
+    }
+
+    #js-platform-list {
+      li {
+        width: fit-content;
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  h1 {
+    padding: 25px 0px;
+  }
+  #resultsNav {
+    .resultNextBtn,
+    .resultPrevBtn {
+      padding: 25px 50px;
+      font-size: 2rem;
+      font-weight: 600;
+    }
+  }
+}
+
+@media screen and (min-width: 1280px) {
+  h2 {
+    font-size: 36px;
+  }
+
+  h4 {
+    font-size: 24px;
+  }
+
+  #search-results {
+    li {
+      width: 33%;
+    }
+  }
+}
+
+@media screen and (min-width: 1366px) {
+  #results {
+    #resultsNav {
+      margin-top: 5%;
+    }
+  }
+}
+
+@media screen and (min-width: 1920px) {
+  h2 {
+    font-size: 50px;
+  }
+
+  h4 {
+    font-size: 36px;
+  }
+
+  .btn {
+    padding: 25px 30px;
+  }
+
+  #search-bar {
+    label {
+      font-size: 24px;
+    }
+
+    #js-search-term {
+      height: 50px;
+      width: 50%;
+    }
+
+    .search-btn {
+      font-size: 24px;
+    }
+  }
 }
