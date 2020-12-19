@@ -149,6 +149,46 @@ header {
   border-radius: 25px;
 }
 
+#results #search-results .searchCard .bg-darken .stores {
+  margin-top: -5%;
+  margin-bottom: 5%;
+}
+
+#results #search-results .searchCard .bg-darken .stores h4 {
+  margin-left: 1%;
+}
+
+#results #search-results .searchCard .bg-darken .stores #js-store-list {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  padding-bottom: 5%;
+}
+
+#results #search-results .searchCard .bg-darken .stores #js-store-list a {
+  text-decoration: none;
+  color: white;
+  padding: 15px;
+  background-color: #021a32;
+  width: 100px;
+  margin: 2%;
+}
+
+#results #search-results .searchCard .bg-darken .stores #js-store-list a:hover {
+  color: #a4d7f4;
+  text-align: center;
+}
+
+#results #search-results .searchCard .bg-darken .stores #js-store-list li {
+  font-size: 18px;
+  text-align: center;
+  margin: 1%;
+}
+
 #results #search-results .searchCard .bg-darken .card-info {
   position: relative;
   top: 0;

@@ -150,6 +150,42 @@ header {
           }
         }
 
+        .stores {
+          margin-top: -5%;
+          margin-bottom: 5%;
+
+          h4 {
+            margin-left: 1%;
+          }
+
+          #js-store-list {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            padding-bottom: 5%;
+
+            a {
+              text-decoration: none;
+              color: white;
+              padding: 15px;
+              background-color: #021a32;
+              width: 100px;
+              margin: 2%;
+
+              &:hover {
+                color: #a4d7f4;
+                text-align: center;
+              }
+            }
+
+            li {
+              font-size: 18px;
+              text-align: center;
+              margin: 1%;
+            }
+          }
+        }
+
         .card-info {
           position: relative;
           top: 0;

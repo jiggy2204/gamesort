@@ -1,4 +1,5 @@
 const urlGames = "https://api.rawg.io/api/games";
+const urlStores = "https://api.rawg.io/api/stores";
 const apiKey = "7116511b911644eb964c5cb368954192";
 
 var wishlist = [
@@ -62,6 +63,24 @@ function getSearchResults(games) {
     });
 }
 
+//GET STORES THAT CORRESPOND TO SEARCH ITEMS
+
+function getGameStore() {
+  fetch(urlStores)
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(response.statusText);
+    })
+    .then((responseJson) => {
+      getStoreByGame(responseJson);
+    })
+    .catch((err) => {
+      $(`#js-error-message`).text(`Something went wrong: ${err.message}`);
+    });
+}
+
 function displaySearchResults(responseJson) {
   $("#search-results").empty();
   $("#resultsNav").remove();
@@ -112,6 +131,12 @@ function displaySearchResults(responseJson) {
                         <div id="card-platforms" class="platforms">
                         <ul id="js-platform-list">
                         ${getPlat(responseJson.results[i].platforms)}
+                        </ul>
+                      </div>
+                      <div id="card-stores" class="stores">
+                      <h4>Where To Buy</h4>
+                        <ul id="js-store-list"> 
+                        ${getGameStore(responseJson.results[i].stores)}
                         </ul>
                       </div>
                     </div>                
@@ -165,6 +190,16 @@ function getPlat(platforms) {
   let listItems = [];
   for (let j = 0; j < platforms.length; j++) {
     listItems.push(`<li>${platforms[j].platform.name}</li>`);
+  }
+  return listItems.join("");
+}
+
+function getGameStore(stores) {
+  let listItems = [];
+  for (let j = 0; j < stores.length; j++) {
+    listItems.push(
+      `<a href='${stores[j].store.domain}' target="_blank"><li>${stores[j].store.name}</li></a>`
+    );
   }
   return listItems.join("");
 }
