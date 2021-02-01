@@ -101,10 +101,6 @@ header {
 
 #search-bar {
   margin-left: 10%;
-
-  input {
-    height: 40px;
-  }
 }
 
 #results {
@@ -169,7 +165,8 @@ header {
               color: white;
               padding: 15px;
               background-color: #021a32;
-              width: 100px;
+              border-radius: 20px;
+              width: 150px;
               margin: 2%;
 
               &:hover {
@@ -241,7 +238,7 @@ header {
   #resultsNav {
     .resultNextBtn,
     .resultPrevBtn {
-      padding: 25px 50px;
+      padding: 25px 30px;
       font-size: 2rem;
       font-weight: 600;
     }
@@ -282,7 +279,7 @@ header {
   }
 
   .btn {
-    padding: 25px 30px;
+    padding: 15px 30px;
   }
 
   #search-bar {

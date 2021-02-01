@@ -63,24 +63,6 @@ function getSearchResults(games) {
     });
 }
 
-//GET STORES THAT CORRESPOND TO SEARCH ITEMS
-
-function getGameStore() {
-  fetch(urlStores)
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error(response.statusText);
-    })
-    .then((responseJson) => {
-      getStoreByGame(responseJson);
-    })
-    .catch((err) => {
-      $(`#js-error-message`).text(`Something went wrong: ${err.message}`);
-    });
-}
-
 function displaySearchResults(responseJson) {
   $("#search-results").empty();
   $("#resultsNav").remove();
@@ -135,8 +117,8 @@ function displaySearchResults(responseJson) {
                       </div>
                       <div id="card-stores" class="stores">
                       <h4>Where To Buy</h4>
-                        <ul id="js-store-list"> 
-                        ${getGameStore(responseJson.results[i].stores)}
+                        <ul id="js-store-list">
+                        ${getStores(responseJson.results[i].stores)}
                         </ul>
                       </div>
                     </div>                
@@ -184,6 +166,38 @@ function displaySearchResults(responseJson) {
     });
   }
 }
+
+function getStores(stores) {
+  let storeObjects = [];
+  let listItem = [];
+
+  fetch(urlGames)
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(response.statusText);
+    })
+    .then((responseJson) => {
+      for (let i = 0; i < responseJson.results.length; i++) {
+        storeObjects.push(responseJson.results[i].stores);
+      }
+
+      for (let n = 0; n < storeObjects.length; n++) {
+        if (stores !== null) {
+          for (let y = 0; y < stores.length; y++) {
+            listItem.push(
+              `<a href=${storeObjects[n].store.domain}><li>${storeObjects[n].store.name}</li></a>`
+            );
+          }
+        }
+      }
+    });
+
+  console.log(listItem);
+
+  return listItem.join("");
+}
 // Get Platform List
 
 function getPlat(platforms) {
@@ -194,15 +208,6 @@ function getPlat(platforms) {
   return listItems.join("");
 }
 
-function getGameStore(stores) {
-  let listItems = [];
-  for (let j = 0; j < stores.length; j++) {
-    listItems.push(
-      `<a href='${stores[j].store.domain}' target="_blank"><li>${stores[j].store.name}</li></a>`
-    );
-  }
-  return listItems.join("");
-}
 //Get Next and Previous pages of Search
 
 //NEXT & PREV PAGE
