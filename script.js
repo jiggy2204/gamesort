@@ -167,11 +167,10 @@ function displaySearchResults(responseJson) {
   }
 }
 
-function getStores(stores) {
+function createStores() {
   let storeObjects = [];
-  let listItem = [];
 
-  fetch(urlGames)
+  fetch(urlStores)
     .then((response) => {
       if (response.ok) {
         return response.json();
@@ -180,23 +179,37 @@ function getStores(stores) {
     })
     .then((responseJson) => {
       for (let i = 0; i < responseJson.results.length; i++) {
-        storeObjects.push(responseJson.results[i].stores);
-      }
-
-      for (let n = 0; n < storeObjects.length; n++) {
-        if (stores !== null) {
-          for (let y = 0; y < stores.length; y++) {
-            listItem.push(
-              `<a href=${storeObjects[n].store.domain}><li>${storeObjects[n].store.name}</li></a>`
-            );
-          }
-        }
+        storeObjects.push({
+          slug: responseJson.results[i].slug,
+          name: responseJson.results[i].name,
+          domain: responseJson.results[i].domain,
+        });
       }
     });
+  return storeObjects;
+}
+
+function getStores(stores) {
+  let storeObjects = createStores();
+
+  let listItem = [];
+
+  console.log(storeObjects, stores);
+
+  if (stores !== null) {
+    for (let i = 0; i < storeObjects.length; i++) {
+      for (let x = 0; x < stores.length; x++) {
+        if (stores[x].store.slug === storeObjects[i].slug) {
+          listItem.push(
+            `<a href=${storeObjects[i].domain}><li>${storeObjects[i].name}</li></a>`
+          );
+        }
+      }
+    }
+  }
 
   console.log(listItem);
-
-  return listItem.join("");
+  return listItem;
 }
 // Get Platform List
 
