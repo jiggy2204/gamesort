@@ -37,6 +37,28 @@ Date.prototype.addDays = function (days) {
   return date;
 };
 
+function createStores() {
+  let storeObjects = [];
+
+  fetch(urlStores)
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(response.statusText);
+    })
+    .then((responseJson) => {
+      for (let i = 0; i < responseJson.results.length; i++) {
+        storeObjects.push({
+          slug: responseJson.results[i].slug,
+          name: responseJson.results[i].name,
+          domain: responseJson.results[i].domain,
+        });
+      }
+    });
+  return storeObjects;
+}
+
 function getSearchResults(games) {
   const params = {
     key: apiKey,
@@ -56,14 +78,41 @@ function getSearchResults(games) {
       throw new Error(response.statusText);
     })
     .then((responseJson) => {
-      displaySearchResults(responseJson);
+      return responseJson;
     })
     .catch((err) => {
       $(`#js-error-message`).text(`Something went wrong: ${err.message}`);
     });
 }
 
-function displaySearchResults(responseJson) {
+function createStores(stores) {
+  fetch(stores)
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+    })
+    .then((responseJson) => {
+      let storeObject = [];
+
+      for (let i = 0; i < responseJson.results.length; i++) {
+        storeObjects.push({
+          slug: responseJson.results[i].slug,
+          name: responseJson.results[i].name,
+          domain: responseJson.results[i].domain,
+        });
+      }
+
+      return storeObject;
+    })
+    .catch((err) => {
+      $(`#js-error-message`).text(`no stores: ` + err.message);
+    });
+}
+
+function displaySearchResults(games, stores) {
+  console.log(games, stores);
+
   $("#search-results").empty();
   $("#resultsNav").remove();
 
@@ -71,10 +120,10 @@ function displaySearchResults(responseJson) {
 
   let cardId = "";
 
-  for (let i = 0; i < responseJson.results.length; i++) {
-    cardId = responseJson.results[i].slug;
+  for (let i = 0; i < games.results.length; i++) {
+    cardId = games.results[i].slug;
 
-    let parsing = responseJson.results[i].released.split("-");
+    let parsing = games.results[i].released.split("-");
 
     let getReleaseDate = {
       year: parsing[0],
@@ -90,9 +139,10 @@ function displaySearchResults(responseJson) {
       getReleaseDate.year;
 
     let image = "";
+    let storeInfo = "";
 
-    if (responseJson.results[i].background_image !== null) {
-      image = `<img class="card-img" src="${responseJson.results[i].background_image}">`;
+    if (games.results[i].background_image !== null) {
+      image = `<img class="card-img" src="${games.results[i].background_image}">`;
     }
 
     $("#search-results").append(`
@@ -118,7 +168,7 @@ function displaySearchResults(responseJson) {
                       <div id="card-stores" class="stores">
                       <h4>Where To Buy</h4>
                         <ul id="js-store-list">
-                        ${getStores(responseJson.results[i].stores)}
+                        ${storeInfo}
                         </ul>
                       </div>
                     </div>                
@@ -143,74 +193,30 @@ function displaySearchResults(responseJson) {
   $("#results").append(`<div id="resultsNav"></div>`);
 
   //PREV BUTTON EVENT LISTENER
-  if (responseJson.previous != null) {
+  if (games.previous != null) {
     $("#resultsNav").append(`
     <button id='resultPrev' class='btn resultPrevBtn'>PREV</button>`);
 
     $("#resultPrev").click((event) => {
       event.preventDefault();
 
-      getPage(responseJson.previous);
+      getPage(games.previous);
     });
   }
 
   //NEXT BUTTON EVENT LISTENER
-  if (responseJson.next != null) {
+  if (games.next != null) {
     $("#resultsNav").append(`
     <button id='resultNext' class='btn resultNextBtn'>NEXT</button>`);
 
     $("#resultNext").click((event) => {
       event.preventDefault();
 
-      getPage(responseJson.next);
+      getPage(games.next);
     });
   }
 }
 
-function createStores() {
-  let storeObjects = [];
-
-  fetch(urlStores)
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error(response.statusText);
-    })
-    .then((responseJson) => {
-      for (let i = 0; i < responseJson.results.length; i++) {
-        storeObjects.push({
-          slug: responseJson.results[i].slug,
-          name: responseJson.results[i].name,
-          domain: responseJson.results[i].domain,
-        });
-      }
-    });
-  return storeObjects;
-}
-
-function getStores(stores) {
-  let storeObjects = createStores();
-
-  let listItem = [];
-
-  console.log(storeObjects, stores);
-
-  if (stores !== null) {
-    for (let i = 0; i < storeObjects.length; i++) {
-      for (let x = 0; x < stores.length; x++) {
-        if (stores[x].store.slug === storeObjects[i].slug) {
-          listItem.push(
-            `<a href=${storeObjects[i].domain}><li>${storeObjects[i].name}</li></a>`
-          );
-        }
-      }
-    }
-  }
-
-  console.log(listItem);
-  return listItem;
-}
 // Get Platform List
 
 function getPlat(platforms) {
@@ -240,158 +246,17 @@ function getPage(nav) {
     });
 }
 
-//Display Collection
-
-function displayCollection() {
-  $(".list")
-    .removeClass("hidden")
-    .addClass("collection-group")
-    .setAttr("id", "collection");
-}
-
-//Add to wish or regular collection
-
-function checkIfCollected(card) {
-  //Iterate over collection array and check against object id
-  for (let i = 0; i < collection.length; i++) {
-    //Check if card is in collection
-    if (collection[i].id === card) {
-      return alert("This card already exists in collection");
-    }
-
-    if (collection[i].id !== card) {
-      alert("adding!");
-      addToCollection(card);
-    }
-  }
-}
-
-function checkIfWishlisted(card) {
-  //Iterate over collection array and check against object id
-  for (let i = 0; i < collection.length; i++) {
-    //Check if card is in collection
-    if (collection[i].id === card) {
-      return alert("This card already exists in collection");
-    }
-
-    if (collection[i].id !== card) {
-      alert("wished!");
-      addToWishlist(card);
-    }
-  }
-}
-
-function addToCollection(card) {
-  let newObject = {
-    id: "",
-    bgImage: "",
-    releaseDate: "",
-    genres: [],
-    platforms: [],
-  };
-
-  const params = {
-    key: apiKey,
-    search: card,
-  };
-
-  const queryString = formatQueryParams(params);
-
-  const url = urlGames + "?" + queryString;
-
-  fetch(url)
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error(response.statusText);
-    })
-    .then((responseJson) => {
-      for (let i = 0; i < responseJson.results.length; i++) {
-        if (responseJson.results[i].slug === card) {
-          newObject.id = card;
-          newObject.bgImage = responseJson.results[i].background_image;
-          newObject.releaseDate = responseJson.results[i].released;
-
-          let platforms = responseJson.results[i].platforms;
-          for (let j = 0; j < platforms.length; j++) {
-            newObject.platforms.push(platforms[j].platform.name);
-          }
-
-          let genres = responseJson.results[i].genres;
-          for (let k = 0; k < genres.length; k++) {
-            newObject.genres.push(genres[k].name);
-          }
-        }
-      }
-    })
-    .catch((err) => {
-      $(`#js-error-message").text("Something went wrong: ${err.message}`);
-    });
-  collection.push(newObject);
-  return collection;
-}
-
-function addToWishlist(card) {
-  let newObject = {
-    id: "",
-    bgImage: "",
-    releaseDate: "",
-    genres: [],
-    platforms: [],
-  };
-
-  const params = {
-    key: apiKey,
-    search: card,
-  };
-
-  const queryString = formatQueryParams(params);
-
-  const url = urlGames + "?" + queryString;
-
-  fetch(url)
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error(response.statusText);
-    })
-    .then((responseJson) => {
-      for (let i = 0; i < responseJson.results.length; i++) {
-        if (responseJson.results[i].slug === card) {
-          newObject.id = card;
-          newObject.bgImage = responseJson.results[i].background_image;
-          newObject.releaseDate = responseJson.results[i].released;
-
-          let platforms = responseJson.results[i].platforms;
-          for (let j = 0; j < platforms.length; j++) {
-            newObject.platforms.push(platforms[j].platform.name);
-          }
-
-          let genres = responseJson.results[i].genres;
-          for (let k = 0; k < genres.length; k++) {
-            newObject.genres.push(genres[k].name);
-          }
-        }
-      }
-    })
-    .catch((err) => {
-      $(`#js-error-message").text("Something went wrong: ${err.message}`);
-    });
-
-  wishlist.push(newObject);
-  return wishlist;
-}
-
 //SUBMIT SEARCH BASED ON TITLE
 //These are the inital renders for mobile and up
 function handleSearchForm() {
-  $("form").submit((event) => {
+  let stores = createStores(urlStores);
+
+  let games = $("form").submit((event) => {
     event.preventDefault();
     const game = $("#js-search-term").val();
     getSearchResults(game);
   });
+  console.log(stores, games);
 }
 
 function handleUpcomingGames() {
