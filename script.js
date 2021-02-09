@@ -43,6 +43,7 @@ function getSearchResults(games) {
       $(`#js-error-message`).text(`Something went wrong: ${err.message}`);
     });
 }
+
 function displaySearchResults(responseJson) {
   $("#search-results").empty();
   $("#resultsNav").remove();
@@ -71,8 +72,6 @@ function displaySearchResults(responseJson) {
 
     let image = "";
 
-    console.log(storeInfo);
-
     if (responseJson.results[i].background_image !== null) {
       image = `<img class="card-img" src="${responseJson.results[i].background_image}">`;
     }
@@ -100,7 +99,7 @@ function displaySearchResults(responseJson) {
                       <div id="card-stores" class="stores">
                       <h4>Where To Buy</h4>
                         <ul id="js-store-list">
-                        
+                        ${getStores(responseJson.results[i].stores)}
                         </ul>
                       </div>
                     </div>                
@@ -110,18 +109,6 @@ function displaySearchResults(responseJson) {
         `);
   }
 
-  $("button").click((event) => {
-    event.stopPropagation();
-
-    let card = $(event.currentTarget).closest("li").children("div").attr("id");
-
-    if ($(event.currentTarget).attr("id") === "coll-Btn") {
-      checkIfCollected(card);
-    } else if ($(event.currentTarget).attr("id") === "wish-Btn") {
-      checkIfWishlisted(card);
-    }
-  });
-
   $("#results").append(`<div id="resultsNav"></div>`);
 
   //PREV BUTTON EVENT LISTENER
@@ -130,7 +117,7 @@ function displaySearchResults(responseJson) {
     <button id='resultPrev' class='btn resultPrevBtn'>PREV</button>`);
 
     $("#resultPrev").click((event) => {
-      responseJson.preventDefault();
+      event.preventDefault();
 
       getPage(responseJson.previous);
     });
@@ -159,6 +146,15 @@ function getPlat(platforms) {
   return listItems.join("");
 }
 
+function getStores(stores) {
+  let listItem = [];
+  for (let i = 0; i < stores.length; i++) {
+    listItems.push(`<li>${stores[i].store.name}</li>`);
+  }
+
+  return listItem.join("");
+}
+
 //Get Next and Previous pages of Search
 
 //NEXT & PREV PAGE
@@ -181,9 +177,11 @@ function getPage(nav) {
 //SUBMIT SEARCH BASED ON TITLE
 //These are the inital renders for mobile and up
 function handleSearchForm() {
-  $("form").submit((event) => {
-    event.preventDefault();
+  $("form").submit((e) => {
+    e.preventDefault();
+
     const game = $("#js-search-term").val();
+
     getSearchResults(game);
   });
 }
