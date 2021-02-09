@@ -2,25 +2,6 @@ const urlGames = "https://api.rawg.io/api/games";
 const urlStores = "https://api.rawg.io/api/stores";
 const apiKey = "7116511b911644eb964c5cb368954192";
 
-var wishlist = [
-  {
-    id: "",
-    bgImage: "",
-    releaseDate: "",
-    genres: [],
-    platforms: [],
-  },
-];
-var collection = [
-  {
-    id: "",
-    bgImage: "",
-    releaseDate: "",
-    genres: [],
-    platforms: [],
-  },
-];
-
 // format query paramters for api calls
 function formatQueryParams(params) {
   const queryItems = Object.keys(params).map(
@@ -36,28 +17,6 @@ Date.prototype.addDays = function (days) {
   date.setDate(date.getDate() + days);
   return date;
 };
-
-function createStores() {
-  let storeObjects = [];
-
-  fetch(urlStores)
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error(response.statusText);
-    })
-    .then((responseJson) => {
-      for (let i = 0; i < responseJson.results.length; i++) {
-        storeObjects.push({
-          slug: responseJson.results[i].slug,
-          name: responseJson.results[i].name,
-          domain: responseJson.results[i].domain,
-        });
-      }
-    });
-  return storeObjects;
-}
 
 function getSearchResults(games) {
   const params = {
@@ -78,41 +37,13 @@ function getSearchResults(games) {
       throw new Error(response.statusText);
     })
     .then((responseJson) => {
-      return responseJson;
+      displaySearchResults(responseJson);
     })
     .catch((err) => {
       $(`#js-error-message`).text(`Something went wrong: ${err.message}`);
     });
 }
-
-function createStores(stores) {
-  fetch(stores)
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-    })
-    .then((responseJson) => {
-      let storeObject = [];
-
-      for (let i = 0; i < responseJson.results.length; i++) {
-        storeObjects.push({
-          slug: responseJson.results[i].slug,
-          name: responseJson.results[i].name,
-          domain: responseJson.results[i].domain,
-        });
-      }
-
-      return storeObject;
-    })
-    .catch((err) => {
-      $(`#js-error-message`).text(`no stores: ` + err.message);
-    });
-}
-
-function displaySearchResults(games, stores) {
-  console.log(games, stores);
-
+function displaySearchResults(responseJson) {
   $("#search-results").empty();
   $("#resultsNav").remove();
 
@@ -120,10 +51,10 @@ function displaySearchResults(games, stores) {
 
   let cardId = "";
 
-  for (let i = 0; i < games.results.length; i++) {
-    cardId = games.results[i].slug;
+  for (let i = 0; i < responseJson.results.length; i++) {
+    cardId = responseJson.results[i].slug;
 
-    let parsing = games.results[i].released.split("-");
+    let parsing = responseJson.results[i].released.split("-");
 
     let getReleaseDate = {
       year: parsing[0],
@@ -139,10 +70,11 @@ function displaySearchResults(games, stores) {
       getReleaseDate.year;
 
     let image = "";
-    let storeInfo = "";
 
-    if (games.results[i].background_image !== null) {
-      image = `<img class="card-img" src="${games.results[i].background_image}">`;
+    console.log(storeInfo);
+
+    if (responseJson.results[i].background_image !== null) {
+      image = `<img class="card-img" src="${responseJson.results[i].background_image}">`;
     }
 
     $("#search-results").append(`
@@ -168,7 +100,7 @@ function displaySearchResults(games, stores) {
                       <div id="card-stores" class="stores">
                       <h4>Where To Buy</h4>
                         <ul id="js-store-list">
-                        ${storeInfo}
+                        
                         </ul>
                       </div>
                     </div>                
@@ -193,26 +125,26 @@ function displaySearchResults(games, stores) {
   $("#results").append(`<div id="resultsNav"></div>`);
 
   //PREV BUTTON EVENT LISTENER
-  if (games.previous != null) {
+  if (responseJson.previous != null) {
     $("#resultsNav").append(`
     <button id='resultPrev' class='btn resultPrevBtn'>PREV</button>`);
 
     $("#resultPrev").click((event) => {
-      event.preventDefault();
+      responseJson.preventDefault();
 
-      getPage(games.previous);
+      getPage(responseJson.previous);
     });
   }
 
   //NEXT BUTTON EVENT LISTENER
-  if (games.next != null) {
+  if (responseJson.next != null) {
     $("#resultsNav").append(`
     <button id='resultNext' class='btn resultNextBtn'>NEXT</button>`);
 
     $("#resultNext").click((event) => {
       event.preventDefault();
 
-      getPage(games.next);
+      getPage(responseJson.next);
     });
   }
 }
@@ -249,14 +181,11 @@ function getPage(nav) {
 //SUBMIT SEARCH BASED ON TITLE
 //These are the inital renders for mobile and up
 function handleSearchForm() {
-  let stores = createStores(urlStores);
-
-  let games = $("form").submit((event) => {
+  $("form").submit((event) => {
     event.preventDefault();
     const game = $("#js-search-term").val();
     getSearchResults(game);
   });
-  console.log(stores, games);
 }
 
 function handleUpcomingGames() {
