@@ -1,5 +1,4 @@
 const urlGames = "https://api.rawg.io/api/games";
-const urlStores = "https://api.rawg.io/api/stores";
 const apiKey = "7116511b911644eb964c5cb368954192";
 
 // format query paramters for api calls
@@ -44,6 +43,34 @@ function getSearchResults(games) {
     });
 }
 
+function getMatchingStore(game) {
+  const urlStores = "https://api.rawg.io/api/games/" + game + "/stores";
+
+  fetch(urlStores)
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(response.statusText);
+    })
+    .then((responseJson) => {
+      createStoreList(responseJson);
+    })
+    .catch((err) => {
+      $(`#js-error-message`).text(`Something went wrong: ${err.message}`);
+    });
+}
+
+function createStoreList(responseJson) {
+  let linkList = [];
+
+  for (let i = 0; i < responseJson.results; i++) {
+    `<a href=${responseJson.results[i].url}></a>`;
+  }
+
+  return linkList.join("");
+}
+
 function displaySearchResults(responseJson) {
   $("#search-results").empty();
   $("#resultsNav").remove();
@@ -51,9 +78,12 @@ function displaySearchResults(responseJson) {
   $("#results").removeClass("hidden");
 
   let cardId = "";
+  let storeName = "";
 
   for (let i = 0; i < responseJson.results.length; i++) {
     cardId = responseJson.results[i].slug;
+
+    let storeLink = getMatchingStore(cardId);
 
     let parsing = responseJson.results[i].released.split("-");
 
@@ -99,7 +129,9 @@ function displaySearchResults(responseJson) {
                       <div id="card-stores" class="stores">
                       <h4>Where To Buy</h4>
                         <ul id="js-store-list">
-                        ${getStores(responseJson.results[i].stores)}
+                        ${storeLink.append(
+                          getStoreName(responseJson.results[i].stores)
+                        )}
                         </ul>
                       </div>
                     </div>                
@@ -146,8 +178,9 @@ function getPlat(platforms) {
   return listItems.join("");
 }
 
-function getStores(stores) {
+function getStoreName(stores) {
   let listItem = [];
+
   for (let i = 0; i < stores.length; i++) {
     listItems.push(`<li>${stores[i].store.name}</li>`);
   }
