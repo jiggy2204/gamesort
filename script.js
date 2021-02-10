@@ -1,5 +1,6 @@
 const urlGames = "https://api.rawg.io/api/games";
 const apiKey = "7116511b911644eb964c5cb368954192";
+var storeURL = [];
 
 // format query paramters for api calls
 function formatQueryParams(params) {
@@ -32,58 +33,48 @@ function getSearchResults(games) {
     .then((response) => {
       if (response.ok) {
         return response.json();
+      } else {
+        return Promise.reject(response);
       }
-      throw new Error(response.statusText);
     })
     .then((responseJson) => {
-      displaySearchResults(responseJson);
+      let storeUrls = [];
+      for (let i = 0; i < responseJson.results.length; i++) {
+        fetch(
+          `https://api.rawg.io/api/games/${responseJson.results[i].slug}/stores`
+        )
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            }
+            return Promise.reject(response);
+          })
+          .then((responseJson) => {
+            storeUrls.push(responseJson);
+          })
+          .catch((err) => {
+            $(`#js-error-message`).text(`Something went wrong: ${err.message}`);
+          });
+      }
+      displaySearchResults(responseJson, storeUrls);
     })
     .catch((err) => {
       $(`#js-error-message`).text(`Something went wrong: ${err.message}`);
     });
 }
 
-function getMatchingStore(game) {
-  const urlStores = "https://api.rawg.io/api/games/" + game + "/stores";
+function displaySearchResults(responseJson, storeUrls) {
+  console.log(responseJson, storeUrls);
 
-  fetch(urlStores)
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error(response.statusText);
-    })
-    .then((responseJson) => {
-      createStoreList(responseJson);
-    })
-    .catch((err) => {
-      $(`#js-error-message`).text(`Something went wrong: ${err.message}`);
-    });
-}
-
-function createStoreList(responseJson) {
-  let linkList = [];
-
-  for (let i = 0; i < responseJson.results; i++) {
-    `<a href=${responseJson.results[i].url}></a>`;
-  }
-
-  return linkList.join("");
-}
-
-function displaySearchResults(responseJson) {
   $("#search-results").empty();
   $("#resultsNav").remove();
 
   $("#results").removeClass("hidden");
 
   let cardId = "";
-  let storeName = "";
 
   for (let i = 0; i < responseJson.results.length; i++) {
     cardId = responseJson.results[i].slug;
-
-    let storeLink = getMatchingStore(cardId);
 
     let parsing = responseJson.results[i].released.split("-");
 
@@ -129,9 +120,7 @@ function displaySearchResults(responseJson) {
                       <div id="card-stores" class="stores">
                       <h4>Where To Buy</h4>
                         <ul id="js-store-list">
-                        ${storeLink.append(
-                          getStoreName(responseJson.results[i].stores)
-                        )}
+                          
                         </ul>
                       </div>
                     </div>                
@@ -176,16 +165,6 @@ function getPlat(platforms) {
     listItems.push(`<li>${platforms[j].platform.name}</li>`);
   }
   return listItems.join("");
-}
-
-function getStoreName(stores) {
-  let listItem = [];
-
-  for (let i = 0; i < stores.length; i++) {
-    listItems.push(`<li>${stores[i].store.name}</li>`);
-  }
-
-  return listItem.join("");
 }
 
 //Get Next and Previous pages of Search
