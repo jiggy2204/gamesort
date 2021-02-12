@@ -21,8 +21,8 @@ This is a simple app that allows the user to search for a title, review what sys
 
 **Snapshots**
 
-(images/01_gamesort.jpg)
-(images/02_gamesort.jpg)
+(images/01_gamesort.JPG)
+(images/02_gamesort.JPG)
 
 
 
