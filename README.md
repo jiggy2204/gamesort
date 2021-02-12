@@ -19,6 +19,12 @@ https://jiggy2204.github.io/gamesort/
 
 This is a simple app that allows the user to search for a title, review what systems it is available on, and then a link to go to a store to buy the title. 
 
+**Snapshots**
+
+(images/01_gamesort.jpg)
+(images/02_gamesort.jpg)
+
+
 
 **Technology Used**
 
