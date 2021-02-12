@@ -1,4 +1,5 @@
 const urlGames = "https://api.rawg.io/api/games";
+const urlStores = "https://api.rawg.io/api/stores";
 const apiKey = "7116511b911644eb964c5cb368954192";
 var storeURL = [];
 
@@ -19,6 +20,8 @@ Date.prototype.addDays = function (days) {
 };
 
 function getSearchResults(games) {
+  let lineItems = [];
+
   const params = {
     key: apiKey,
     page_size: 5,
@@ -29,42 +32,24 @@ function getSearchResults(games) {
 
   const url = urlGames + "?" + queryString;
 
-  fetch(url)
+  Promise.all([fetch(url), fetch(urlStores)])
     .then((response) => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        return Promise.reject(response);
-      }
+      return Promise.all(
+        response.map((res) => {
+          return res.json();
+        })
+      );
     })
-    .then((responseJson) => {
-      let storeUrls = [];
-      for (let i = 0; i < responseJson.results.length; i++) {
-        fetch(
-          `https://api.rawg.io/api/games/${responseJson.results[i].slug}/stores`
-        )
-          .then((response) => {
-            if (response.ok) {
-              return response.json();
-            }
-            return Promise.reject(response);
-          })
-          .then((responseJson) => {
-            storeUrls.push(responseJson);
-          })
-          .catch((err) => {
-            $(`#js-error-message`).text(`Something went wrong: ${err.message}`);
-          });
-      }
-      displaySearchResults(responseJson, storeUrls);
+    .then((data) => {
+      displaySearchResults(data);
     })
     .catch((err) => {
       $(`#js-error-message`).text(`Something went wrong: ${err.message}`);
     });
 }
 
-function displaySearchResults(responseJson, storeUrls) {
-  console.log(responseJson, storeUrls);
+function displaySearchResults(responseJson) {
+  console.log(responseJson);
 
   $("#search-results").empty();
   $("#resultsNav").remove();
@@ -73,10 +58,10 @@ function displaySearchResults(responseJson, storeUrls) {
 
   let cardId = "";
 
-  for (let i = 0; i < responseJson.results.length; i++) {
-    cardId = responseJson.results[i].slug;
+  for (let i = 0; i < responseJson[0].results.length; i++) {
+    cardId = responseJson[0].results[i].slug;
 
-    let parsing = responseJson.results[i].released.split("-");
+    let parsing = responseJson[0].results[i].released.split("-");
 
     let getReleaseDate = {
       year: parsing[0],
@@ -93,8 +78,8 @@ function displaySearchResults(responseJson, storeUrls) {
 
     let image = "";
 
-    if (responseJson.results[i].background_image !== null) {
-      image = `<img class="card-img" src="${responseJson.results[i].background_image}">`;
+    if (responseJson[0].results[i].background_image !== null) {
+      image = `<img class="card-img" src="${responseJson[0].results[i].background_image}">`;
     }
 
     $("#search-results").append(`
@@ -108,19 +93,19 @@ function displaySearchResults(responseJson, storeUrls) {
 
                         <div id="card-text">
                           <p class='card-name'>${
-                            responseJson.results[i].name
+                            responseJson[0].results[i].name
                           }</p>
                           <p class='card-name'>Release Date: ${formattedDate}</p>
                         </div>
                         <div id="card-platforms" class="platforms">
                         <ul id="js-platform-list">
-                        ${getPlat(responseJson.results[i].platforms)}
+                        ${getPlat(responseJson[0].results[i].platforms)}
                         </ul>
                       </div>
                       <div id="card-stores" class="stores">
                       <h4>Where To Buy</h4>
                         <ul id="js-store-list">
-                          
+                      ${getLinks(responseJson[1].results[i])}
                         </ul>
                       </div>
                     </div>                
@@ -133,26 +118,26 @@ function displaySearchResults(responseJson, storeUrls) {
   $("#results").append(`<div id="resultsNav"></div>`);
 
   //PREV BUTTON EVENT LISTENER
-  if (responseJson.previous != null) {
+  if (responseJson[0].previous != null) {
     $("#resultsNav").append(`
     <button id='resultPrev' class='btn resultPrevBtn'>PREV</button>`);
 
     $("#resultPrev").click((event) => {
       event.preventDefault();
 
-      getPage(responseJson.previous);
+      getPage(responseJson[0].previous);
     });
   }
 
   //NEXT BUTTON EVENT LISTENER
-  if (responseJson.next != null) {
+  if (responseJson[0].next != null) {
     $("#resultsNav").append(`
     <button id='resultNext' class='btn resultNextBtn'>NEXT</button>`);
 
     $("#resultNext").click((event) => {
       event.preventDefault();
 
-      getPage(responseJson.next);
+      getPage(responseJson[0].next);
     });
   }
 }
@@ -167,19 +152,23 @@ function getPlat(platforms) {
   return listItems.join("");
 }
 
+function getLinks(stores) {
+  return `<a href='https://${stores.domain}' target='_blank'><li>${stores.name}</li></a>`;
+}
 //Get Next and Previous pages of Search
 
 //NEXT & PREV PAGE
 function getPage(nav) {
-  fetch(nav)
+  Promise.all([fetch(nav), fetch(urlStores)])
     .then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error(response.statusText);
+      return Promise.all(
+        response.map((res) => {
+          return res.json();
+        })
+      );
     })
-    .then((responseJson) => {
-      displaySearchResults(responseJson);
+    .then((data) => {
+      displaySearchResults(data);
     })
     .catch((err) => {
       $(`#js-error-message`).text(`Something went wrong: ${err.message}`);

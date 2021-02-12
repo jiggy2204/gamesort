@@ -183,7 +183,7 @@ header {
 #results #search-results .searchCard .bg-darken .stores #js-store-list li {
   font-size: 18px;
   text-align: center;
-  margin: 1%;
+  margin: 1% auto;
 }
 
 #results #search-results .searchCard .bg-darken .card-info {
