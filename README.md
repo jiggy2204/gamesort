@@ -14,3 +14,20 @@ Implementation details are left entirely up to you, but at a minimum your app mu
 **Link to Live App**
 https://jiggy2204.github.io/gamesort/
 
+
+**Summary**
+
+This is a simple app that allows the user to search for a title, review what systems it is available on, and then a link to go to a store to buy the title. 
+
+
+**Technology Used**
+
+- VS Code
+- GitHub
+- Slick (https://kenwheeler.github.io/slick/) for the carousel)
+- HTML
+- SCSS/CSS
+- Javascript
+- LESS
+- jQuery
+
