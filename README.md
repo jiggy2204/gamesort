@@ -9,3 +9,8 @@ Implementation details are left entirely up to you, but at a minimum your app mu
 - Use Fetch to asynchronously load data from one or more APIs
 - Use jQuery's DOM traversal and manipulation functionality to display the data from the API to the user in an interesting way
 - Use jQuery's event listening capabilities to respond to user actions
+
+
+**Link to Live App**
+https://jiggy2204.github.io/gamesort/
+
